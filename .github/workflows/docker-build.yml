@@ -25,7 +25,11 @@ jobs:
             | jq -r '.[] | select(test("gunthy-linux"))' \
             | sort -t_ -k2 -V \
             | tail -n1)
-          echo "latest=$latest" >> $GITHUB_OUTPUT
+
+          version=$(echo "$latest" | sed -E 's/.*_([0-9]+\.[0-9]+\.[0-9]+)\.zip/\1/')
+
+          echo "file=$latest" >> $GITHUB_OUTPUT
+          echo "version=$version" >> $GITHUB_OUTPUT
 
       - name: Use the latest version
         run: |
@@ -37,7 +41,7 @@ jobs:
           push: true
           tags: |
             ahmedbodi/gunbot-colorised:latest
-            ahmedbodi/gunbot-colorised:${{ steps.gunthy.outputs.latest }}
+            ahmedbodi/gunbot-colorised:${{ steps.gunthy.outputs.version }}
 
       - name: Update Docker Hub Description
         uses: peter-evans/dockerhub-description@v2
