@@ -18,11 +18,26 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
+      - name: Get latest Linux version
+        id: gunthy
+        run: |
+          latest=$(curl -s https://gunthy.org:3009/api/repo-files \
+            | jq -r '.[] | select(test("gunthy-linux"))' \
+            | sort -t_ -k2 -V \
+            | tail -n1)
+          echo "latest=$latest" >> $GITHUB_OUTPUT
+
+      - name: Use the latest version
+        run: |
+          echo "Latest Linux build is: ${{ steps.gunthy.outputs.latest }}"
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v2
         with:
           push: true
-          tags: ahmedbodi/gunbot-colorised:latest
+          tags: |
+            ahmedbodi/gunbot-colorised:latest
+            ahmedbodi/gunbot-colorised:${{ steps.gunthy.outputs.latest }}
 
       - name: Update Docker Hub Description
         uses: peter-evans/dockerhub-description@v2
