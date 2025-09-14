@@ -1,4 +1,4 @@
-FROM bitnami/minideb:latest
+FROM alpine:latest
 
 ARG INSTALL_URL="https://gunthy.org/downloads/gunthy_linux.zip"
 ARG DEBIAN_FRONTEND=noninteractive
@@ -33,7 +33,6 @@ RUN fc-cache -fv
 
 ## Install Gunbot
 WORKDIR /tmp
-#COPY "gunthy-linux.zip" "/tmp/gunthy-linux.zip"
 RUN curl -Lo /tmp/lin.zip ${INSTALL_URL} \
  && unzip -q /tmp/lin.zip -d /tmp/gunthy_linux \
  && mv gunthy_* /gunbot \
@@ -45,6 +44,4 @@ RUN curl -Lo /tmp/lin.zip ${INSTALL_URL} \
 WORKDIR /gunbot
 
 EXPOSE 5000
-VOLUME [ "/gunbot/backups", "/gunbot/logs", "/gunbot/json", "/gunbot/config.js", "/gunbot/gunbotgui.db"]
-
 CMD /gunbot/gunthy-linux
