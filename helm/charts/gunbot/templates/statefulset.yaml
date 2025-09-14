@@ -1,0 +1,53 @@
+{{- $name := include "gunbot.name" . -}}
+{{- $labels := include "gunbot.labels" . -}}
+{{- $selectorLabels := include "gunbot.selectorLabels" . -}}
+{{- range $instanceName, $instance := .Values.instances }}
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ $name }}-{{ $instanceName }}
+  labels: {{ $labels | nindent 4 }}
+spec:
+  serviceName: {{ $name }}-{{ $instanceName }}-headless
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- $selectorLabels | nindent 6 }}
+      app.gunthy.org/instance: {{ $instanceName }}
+  template:
+    metadata:
+      labels:
+        {{- $selectorLabels | nindent 8}}
+        app.gunthy.org/instance: {{ $instanceName }}
+    spec:
+      initContainers:
+        - name: gunbot-init
+          image: "{{ $.Values.image.repository }}:{{ $.Values.image.tag }}"
+          command:
+            - sh
+            - -c
+            - |
+              echo "Initializing PV with Gunbot binary and dependencies..."
+              cp -r /gunbot/* /gunbot-data/
+          volumeMounts:
+            - name: gunbot-data
+              mountPath: /gunbot-data
+      containers:
+        - name: gunbot
+          image: "{{ $.Values.image.repository }}:{{ $.Values.image.tag }}"
+          imagePullPolicy: {{ $.Values.image.pullPolicy }}
+          ports:
+            - containerPort: {{ $.Values.service.port }}
+          volumeMounts:
+            - name: gunbot-data
+              mountPath: /gunbot
+  volumeClaimTemplates:
+    - metadata:
+        name: gunbot-data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: {{ $instance.storage.size | default "5Gi" }}
+{{- end }}

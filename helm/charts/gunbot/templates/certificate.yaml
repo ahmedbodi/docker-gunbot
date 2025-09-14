@@ -1,0 +1,17 @@
+{{- $name := include "gunbot.name" . -}}
+{{- $labels := include "gunbot.labels" . -}}
+{{- $selectorLabels := include "gunbot.selectorLabels" . -}}
+{{- range $instanceName, $instance := .Values.instances }}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ $name }}-{{ $instanceName }}
+spec:
+  secretName: {{ $name }}-{{ $instanceName }}-https
+  issuerRef:
+    name: letsencrypt
+    kind: ClusterIssuer
+  dnsNames:
+    - {{ $instance.url }}
+{{- end }}

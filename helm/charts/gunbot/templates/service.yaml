@@ -1,0 +1,22 @@
+{{- $name := include "gunbot.name" . -}}
+{{- $labels := include "gunbot.labels" . -}}
+{{- $selectorLabels := include "gunbot.selectorLabels" . -}}
+{{- range $instanceName, $instance := .Values.instances }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $name }}-{{ $instanceName }}
+  labels:
+    {{- $labels | nindent 4 }}
+spec:
+  selector:
+    {{- $selectorLabels | nindent 4 }}
+    app.gunthy.org/instance: {{ $instanceName }}
+  type: ClusterIP
+  ports:
+    - port: 3000
+      targetPort: 3000
+      protocol: TCP
+      name: http
+{{- end }}

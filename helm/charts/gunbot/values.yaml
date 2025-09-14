@@ -1,0 +1,25 @@
+image:
+  repository: ahmedbodi/gunbot-colorised
+  tag: 30.5.5
+  pullPolicy: Always
+
+service:
+  port: 3000
+
+instances:
+  machinegun:
+    url: machinegun.local
+    storage:
+      size: 5Gi
+  quantag:
+    url: quantag.local
+    storage:
+      size: 5Gi
+  starsignal:
+    url: starsignal.local
+    storage:
+      size: 5Gi
+  exotrader:
+    url: exotrader.local
+    storage:
+      size: 5Gi
