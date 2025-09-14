@@ -1,4 +1,4 @@
-FROM alpine:latest
+FROM bitnami/minideb:latest
 
 ARG INSTALL_URL="https://gunthy.org/downloads/gunthy_linux.zip"
 ARG DEBIAN_FRONTEND=noninteractive
