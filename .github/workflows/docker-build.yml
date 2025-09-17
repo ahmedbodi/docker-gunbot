@@ -7,10 +7,20 @@ on:
 
 jobs:
   build-and-push:
+    if: github.actor != 'github-actions'
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repo
         uses: actions/checkout@v2
+
+      - name: Extract Version from Helm Chart
+        id: helm_version
+        run: |
+          APP_VERSION=$(yq e '.appVersion' ./helm/charts/gunbot/Chart.yaml)
+          echo "appVersion=$APP_VERSION" >> $GITHUB_ENV
+
+      - name: Print Gunbot Version
+        run: echo "The app version is ${{ env.appVersion }}"
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v1
@@ -18,30 +28,13 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Get latest Linux version
-        id: gunthy
-        run: |
-          latest=$(curl -s https://gunthy.org:3009/api/repo-files \
-            | jq -r '.[] | select(test("gunthy-linux"))' \
-            | sort -t_ -k2 -V \
-            | tail -n1)
-
-          version=$(echo "$latest" | sed -E 's/.*_([0-9]+\.[0-9]+\.[0-9]+)\.zip/\1/')
-
-          echo "file=$latest" >> $GITHUB_OUTPUT
-          echo "version=$version" >> $GITHUB_OUTPUT
-
-      - name: Use the latest version
-        run: |
-          echo "Latest Linux build is: ${{ steps.gunthy.outputs.latest }}"
-
       - name: Build and push Docker image
         uses: docker/build-push-action@v2
         with:
           push: true
           tags: |
             ahmedbodi/gunbot-colorised:latest
-            ahmedbodi/gunbot-colorised:${{ steps.gunthy.outputs.version }}
+            ahmedbodi/gunbot-colorised:${{ env.appVersion }}
 
       - name: Update Docker Hub Description
         uses: peter-evans/dockerhub-description@v2
@@ -50,3 +43,29 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
           repository: ahmedbodi/gunbot-colorised
           readme-filepath: ./README.md
+
+      - name: Increment chart version
+        run: |
+          # Get current chart version
+          CURRENT_VERSION=$(yq e '.version' ./chart/Chart.yaml)
+          echo "Current chart version: $CURRENT_VERSION"
+
+          # Split into major.minor.patch
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT_VERSION"
+          # Increment patch
+          PATCH=$((PATCH + 1))
+          NEW_VERSION="$MAJOR.$MINOR.$PATCH"
+          echo "New chart version: $NEW_VERSION"
+
+          # Update Chart.yaml
+          yq e -i ".version = \"$NEW_VERSION\"" ./helm/charts/gunbot/Chart.yaml
+
+          # Update values.yaml
+          yq e -i ".image.tag = \"${{ env.appVersion }}\"" ./helm/charts/gunbot/values.yaml
+
+          # Commit and push
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add ./helm/charts/gunbot
+          git commit -m "Bump chart version to $NEW_VERSION, set image.tag to ${{ env.appVersion }}"
+          git push

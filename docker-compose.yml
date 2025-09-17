@@ -9,7 +9,7 @@ networks:
 services:
   gunbot-binance:
     container_name: gunbot-binance
-    image: magicdude4eva/gunbot-colorised:latest
+    image: ahmedbodi/gunbot-colorised:latest
     restart: unless-stopped
     ports:
       - 5555:5000
@@ -39,7 +39,7 @@ services:
       
   gunbot-kucoin:
     container_name: gunbot-kucoin
-    image: magicdude4eva/gunbot-colorised:latest
+    image: ahmedbodi/gunbot-colorised:latest
     restart: unless-stopped
     ports:
       - 5556:5000

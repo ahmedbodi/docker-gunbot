@@ -4,7 +4,7 @@ ARG INSTALL_URL="https://gunthy.org/downloads/gunthy_linux.zip"
 ARG DEBIAN_FRONTEND=noninteractive
 
 ARG VCS_REF
-LABEL org.label-schema.vcs-ref=$VCS_REF org.label-schema.vcs-url="https://github.com/magicdude4eva/docker-gunbot"
+LABEL org.label-schema.vcs-ref=$VCS_REF org.label-schema.vcs-url="https://github.com/ahmedbodi/docker-gunbot"
 LABEL description="Gunbot Docker Image Using minimal GlibC image with colorised output"
 
 ## Setup Enviroment
