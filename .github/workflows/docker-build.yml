@@ -47,7 +47,7 @@ jobs:
       - name: Increment chart version
         run: |
           # Get current chart version
-          CURRENT_VERSION=$(yq e '.version' ./chart/Chart.yaml)
+          CURRENT_VERSION=$(yq e '.version' ./helm/charts/gunbot/Chart.yaml)
           echo "Current chart version: $CURRENT_VERSION"
 
           # Split into major.minor.patch
