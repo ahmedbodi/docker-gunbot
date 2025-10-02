@@ -9,15 +9,43 @@ instances:
     url: machinegun.local
     storage:
       size: 5Gi
+    resources:
+      requests:
+        cpu: 50m
+        memory: 600Mi
+      limits:
+        cpu: 200m
+        memory: 1Gi
   quantag:
     url: quantag.local
     storage:
       size: 5Gi
+    resources:
+      requests:
+        cpu: 50m
+        memory: 600Mi
+      limits:
+        cpu: 200m
+        memory: 1Gi
   starsignal:
     url: starsignal.local
     storage:
       size: 5Gi
+    resources:
+      requests:
+        cpu: 50m
+        memory: 600Mi
+      limits:
+        cpu: 200m
+        memory: 1Gi
   exotrader:
     url: exotrader.local
     storage:
       size: 5Gi
+    resources:
+      requests:
+        cpu: 50m
+        memory: 600Mi
+      limits:
+        cpu: 200m
+        memory: 1Gi
