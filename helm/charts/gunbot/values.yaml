@@ -1,6 +1,6 @@
 image:
   repository: ahmedbodi/gunbot-colorised
-  tag: 30.5.8
+  tag: 30.5.9
   pullPolicy: Always
 service:
   port: 3000
